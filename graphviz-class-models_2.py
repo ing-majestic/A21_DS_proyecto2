@@ -2,6 +2,48 @@
 from graphviz import Digraph
 import random
 
+
+#Se inicializa clase que permite crear los archivos de visualizaciónote
+#Se genera el grafo en formato GV y en formato PNG para su futuro analisis
+class graphviz():
+
+    #constructor
+    def __init__(self, name):
+        self.graphvis = {}
+        self.name = str(name)
+        self.dot = Digraph(name,comment='The Round Graph')
+    #Función que agrega nodo con etiqueta para generar el archivo GV y PNG
+    def agregaNodol(self,v,et,el):
+        vs = str(v)
+        es = str(et)
+        ex = str(el)
+        self.dot.node(vs, es, xlabel= ex)
+    #Función que agrega nodo sin etiqueta para generar el archivo GV y PNG
+    def agregaNodo(self,v,et):
+        vs = str(v)
+        es = str(et)
+        self.dot.node(vs, es)
+    #Función que permite crear la lista en formato adecuado
+    def listaedges(self,l2,a,b):
+        c = str(a) + str(b)
+        l2.append(c)
+    #funcion que agrega arista por arista con una variable c con valor false o true
+    def agregaedge(self, a, b):
+        c = str(a)
+        d = str(b)
+        self.dot.edge(c , d, constraint='false')
+    #Función que permite agregar la lista de conexiónes
+    def agregaedges(self,l2):
+        self.dot.edges(l2)
+    #Función encargada de generar el archivo GV como el PNG
+    def imprimegrafo(self, nodos):
+        print('-------Impresion y generacion GV de Grafo')
+        #self.dot.format = 'png'
+        a ='Graphviz-output/'
+        b = a + str(self.name)+'_'+nodos+'.gv'
+        self.dot.render(b, view = False)
+        #print(self.dot.source) #doctest: +NORMALIZE_WHITESPACE
+
 #Se inicializa la clase encargada de administrar los nodos del Grafo
 class Nodo:
     #constructor
@@ -28,6 +70,9 @@ class Arista:
 
 #Se inicializa la clase Grafo que se encarga de administrar y generar los elementos del Grafo
 class Grafo:
+    g2 = Digraph('BFS',comment='The Round Graph')
+    g3 = Digraph('DFS',comment='The Round Graph')
+
     #constructor
     def __init__(self):
         self.id = {}
@@ -43,16 +88,10 @@ class Grafo:
             self.vertices[b].agregaVecino(a)
 
     #metodo para calcular BFS
-#class Bfs():
-#    def __init__(self):
-#        self.id = {}
-
-    def bfs(self,r,h2):
-
+    def bfs(self,r):
 
         if r in self.vertices:
             cola = [r]
-
             self.vertices[r].visitado = True
             self.vertices[r].nivel = 0
 
@@ -67,22 +106,11 @@ class Grafo:
                         cola.append(v)
                         self.vertices[v].visitado = True
                         self.vertices[v].nivel = self.vertices[act].nivel + 1
-                        a = v
-                        b = self.vertices[v].nivel
                         print("(" + str (v) + ", " + str(self.vertices[v].nivel) + ")")
-                        h2.agregaNodol(b,a,b)
-        name = 'BFS_grafo'
-        h2.imprimegrafo(name)
+                        self.g2.edge(str(act), str(v))
 
     #Metodo para calcular DFS
-#class Dfs():
-
-
-#    def __init__(self):
-#        self.dfs = 0
-
     def dfs(self, h):
-
 
         if h in self.vertices:
             self.vertices[h].visitado = True
@@ -90,48 +118,26 @@ class Grafo:
                 if self.vertices[nodo].visitado == False:
                     self.vertices[nodo].padre = h
                     print("(" + str(nodo) + ", " + str(h) + ")")
+                    self.g3.edge(str(h),str(nodo))
                     self.dfs(nodo)
 
-#Se inicializa clase que permite crear los archivos de visualizaciónote
-#Se genera el grafo en formato GV y en formato PNG para su futuro analisis
-class graphviz:
-    dot = Digraph(comment='The Round Graph')
-    #constructor
-    def __init__(self):
-        self.graphvis = {}
-    #Función que agrega nodo con etiqueta para generar el archivo GV y PNG
-    def agregaNodol(self,v,et,el):
-        vs = str(v)
-        es = str(et)
-        ex = str(el)
-        self.dot.node(vs, es, xlabel= ex)
-    #Función que agrega nodo sin etiqueta para generar el archivo GV y PNG
-    def agregaNodo(self,v,et):
-        vs = str(v)
-        es = str(et)
-        self.dot.node(vs, es)
-    #Función que permite crear la lista en formato adecuado
-    def listaedges(self,l2,a,b):
-        c = str(a) + str(b)
-        l2.append(c)
-    #funcion que agrega arista por arista con una variable c con valor false o true
-    def agregaedge(self, a, b):
-        c = str(a)
-        d = str(b)
-        self.dot.edge(c , d, constraint='false')
-    #Función que permite agregar la lista de conexiónes
-    def agregaedges(self,l2):
-        self.dot.edges(l2)
-    #Función encargada de generar el archivo GV como el PNG
-    def imprimegrafo(self, nom):
-        print('-------Impresion y generacion GV de Grafo')
-        #self.dot.format = 'png'
+
+
+    def imprime_bfs(self, N, nom):
+        nodos = str(N)
+        #nom = "1_Malla_bfs"
+        #self.g2.view()
         a ='Graphviz-output/'
-        b = a + str(nom)+ '.gv'
-        self.dot.render(b, view = True)
-        #print(self.dot.source) #doctest: +NORMALIZE_WHITESPACE
+        b = a + str(nom)+'_'+'BFS'+'_'+nodos+'.gv'
+        self.g2.render(b, view = False)
 
-
+    def imprime_dfs(self, N, nom):
+        nodos = str(N)
+        #nom = "1_Malla_dfs"
+        #self.g3.view()
+        a ='Graphviz-output/'
+        b = a + str(nom)+'_'+'DFS'+'_'+nodos+'.gv'
+        self.g3.render(b, view = False)
 #clase del modelo Malla
 #Función con la que se integra el GRAFO de estudio
 class Malla():
@@ -142,15 +148,13 @@ class Malla():
         #Llamado de las clases
         g = Grafo()
         j = Grafo()
-        h1 = graphviz()
-        h2 = graphviz()
-        h3 = graphviz()
-        #k1 = Bfs()
-        #k2 = Dfs()
+        h1 = graphviz('1_malla_pri')
+
         #Pide el numero de nodos que tendra el Grafo
         print ("-----GRAFO MALLA------")
         print ("Ingresa el numero de nodos: ")
         N = int(input())
+        nodos = str(N)
         l = list(range(1,N+1))
 
         for v in l:
@@ -199,16 +203,17 @@ class Malla():
         # Generación de calculo por bfs
         #if n2 == 1:
         print('-------Grafo calculado BFS')
-        g.bfs(1,h2)
+        g.bfs(1)
         # Generación de calculo por dfs
         #elif n2 == 2:
         print('-------Grafo calculado DFS')
         print ("(1, NULL)")
         j.dfs(1)
         #Generacion y guardado de fuente archivo GV y PNG en \Graphviz-output
-        nodos = str(N)
         nom = "1_Malla"
-        h1.imprimegrafo(nom+'_'+nodos)
+        g.imprime_bfs(N, nom)
+        j.imprime_dfs(N, nom)
+        h1.imprimegrafo(nodos)
         return (l, l3)
 
 #clase del modelo erdos and enry
@@ -221,15 +226,15 @@ class Erdosrenyi():
         #Inicializa un grafo
         g = Grafo()
         k = Grafo()
-        h = graphviz()
-        h2 = graphviz()
-        h3 = graphviz()
+        h = graphviz('2_ErdosRenyi_pri')
+
         l2 = []
         l3 = []
         #Pide el numero de nodos que tendra el Grafo
         print ("-----GRAFO ERDOS ENRY------")
         print ("Ingresa el numero de nodos: ")
         N = int(input())
+        nodos = str(N)
         l = list(range(1,N+1))
 
         for v in l:
@@ -277,15 +282,16 @@ class Erdosrenyi():
         # Generación de calculo por bfs
         #if n2 == 1:
         print('-------Grafo calculado BFS')
-        g.bfs(1, h2)
+        g.bfs(1)
         # Generación de calculo por dfs
         #elif n2 == 2:
         print('-------Grafo calculado DFS')
         print ("(1, NULL)")
         k.dfs(1)
-        nodos = str(N)
         nom = "2_ErdosRenyi"
-        h.imprimegrafo(nom+'_'+nodos)
+        g.imprime_bfs(N, nom)
+        k.imprime_dfs(N, nom)
+        h.imprimegrafo(nodos)
         return(l, l3)
 
 class Gilbert():
@@ -295,24 +301,24 @@ class Gilbert():
 
     def gilbert(self):
         #Inicializa un grafo
-        g = Grafo()
-        k = Grafo()
-        h = graphviz()
-        h2 = graphviz()
-        h3 = graphviz()
+        g3 = Grafo()
+        k3 = Grafo()
+        h3 = graphviz('3_Gilbert_pri')
+
         l2 = []
         l3 = []
         #Pide el numero de nodos que tendra el Grafo
         print ("-----GRAFO GILBERT------")
         print ("Ingresa el numero de nodos: ")
         N = int(input())
+        nodos = str(N)
         l = list(range(1,N+1))
 
         for v in l:
-            g.agregaVertice(v)
-            k.agregaVertice(v)
+            g3.agregaVertice(v)
+            k3.agregaVertice(v)
             #Se agregan nodos al constructor de GV y PNG
-            h.agregaNodo(v,v)
+            h3.agregaNodo(v,v)
 
         #Pide el rango d eprobabilidad P
         print("Ingresa el valor de probabilidad de cada nodo: ")
@@ -327,10 +333,10 @@ class Gilbert():
                     #Verificar si R < P
                     if (R < P):
                         # Agrega las aristas para el grafo
-                        g.agregarArista(i, j)
-                        k.agregarArista(i, j)
+                        g3.agregarArista(i, j)
+                        k3.agregarArista(i, j)
                         #Se genera la lista para el archivo GV
-                        h.agregaedge(i, j)
+                        h3.agregaedge(i, j)
                         c=str(i)
                         d=str(j)
                         e = '->'
@@ -344,24 +350,25 @@ class Gilbert():
         #Se imprime encabezado de resultados
         print('-------Grafo lista de adyacentes')
         #Se construye la lista de adyacencia
-        for v in g.vertices:
-            print(v, g.vertices[v].vecinos)
+        for v in g3.vertices:
+            print(v, g3.vertices[v].vecinos)
         #Menu para seleccionar el tipo d ecalculo a realizar en al Grafo
         #print ("Ingresa '1' para bfs o '2' para dfs: ")
         #n2 = int(input())
         # Generación de calculo por bfs
         #if n2 == 1:
         print('-------Grafo calculado BFS')
-        g.bfs(1, h2)
+        g3.bfs(1)
         # Generación de calculo por dfs
         #elif n2 == 2:
         print('-------Grafo calculado DFS')
         print ("(1, NULL)")
-        k.dfs(1)
+        k3.dfs(1)
         #Generacion y guardado de fuente archivo GV y PNG en \Graphviz-output
-        nodos = str(N)
         nom = "3_Gilbert"
-        h.imprimegrafo(nom+'_'+nodos)
+        g3.imprime_bfs(N, nom)
+        k3.imprime_dfs(N, nom)
+        h3.imprimegrafo(nodos)
         return(l, l3)
 
 #Funcion principal de llamado del programa
@@ -375,8 +382,6 @@ def main():
     a.malla()
     #Se ejecuta erdos que a su vez devuelve las cadenas de vertices y aristas
     #a variables para poder ser usadas en otras clases o funciones
-    l, l3 = b.erdosrenyi()
-    #print(l)
-    #print(l3)
+    b.erdosrenyi()
     c.gilbert()
 main()
